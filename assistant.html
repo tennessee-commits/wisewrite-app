@@ -4,13 +4,101 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Writing Assistant – WiseWrite</title>
-  <link rel="stylesheet" href="resources/style.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background: #f7fafc; }
+    #editor { min-height: 60vh; resize: vertical; }
+  </style>
 </head>
-<body>
-  <h1>Writing Assistant</h1>
-  <nav><a href="index.html">← Home</a></nav>
-  <textarea id="editor" placeholder="Start writing…"></textarea>
-  <div id="status">Auto-saved locally</div>
+<body class="bg-gray-50 text-gray-800">
+  <!-- NAV -->
+  <nav class="bg-white shadow-sm border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <a href="index.html" class="text-gray-500 hover:text-gray-700 text-sm">← Home</a>
+        <h1 class="text-xl font-semibold text-gray-900">Writing Assistant</h1>
+        <div class="w-10"></div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- SPLIT SCREEN -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 grid lg:grid-cols-3 gap-8">
+    <!-- LEFT: EDITOR -->
+    <div class="lg:col-span-2">
+      <div class="bg-white rounded-2xl shadow-lg p-6">
+        <div class="mb-4 flex items-center justify-between">
+          <h2 class="text-lg font-semibold text-gray-900">Editor</h2>
+          <div class="flex items-center space-x-2 text-sm text-gray-500">
+            <span id="wordCount">0 words</span>
+            <span>•</span>
+            <span id="readability">Grade 8</span>
+          </div>
+        </div>
+        <textarea id="editor" class="w-full p-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Start writing your next great post…"></textarea>
+        <div id="status" class="text-xs text-gray-500 mt-2">Auto-saved locally</div>
+      </div>
+    </div>
+
+    <!-- RIGHT: AI SUGGESTIONS -->
+    <div class="space-y-6">
+      <!-- Suggestions -->
+      <div class="bg-white rounded-2xl shadow-lg p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">AI Suggestions</h3>
+        <div id="suggestions" class="space-y-3">
+          <div class="p-3 bg-blue-50 rounded-lg border-l-4 border-blue-400">
+            <p class="text-sm font-medium text-blue-800">Clarity boost</p>
+            <p class="text-xs text-blue-600 mt-1">Replace "a lot of" with "many" for precision.</p>
+            <button class="mt-2 text-xs text-blue-600 hover:underline">Apply</button>
+          </div>
+          <div class="p-3 bg-green-50 rounded-lg border-l-4 border-green-400">
+            <p class="text-sm font-medium text-green-800">Engagement hook</p>
+            <p class="text-xs text-green-600 mt-1">Start with a question to draw readers in.</p>
+            <button class="mt-2 text-xs text-green-600 hover:underline">Apply</button>
+          </div>
+          <div class="p-3 bg-yellow-50 rounded-lg border-l-4 border-yellow-400">
+            <p class="text-sm font-medium text-yellow-800">Tone check</p>
+            <p class="text-xs text-yellow-600 mt-1">Consider a more conversational tone.</p>
+            <button class="mt-2 text-xs text-yellow-600 hover:underline">Apply</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Performance Prediction -->
+      <div class="bg-white rounded-2xl shadow-lg p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Performance Prediction</h3>
+        <div class="space-y-4">
+          <div>
+            <div class="flex justify-between text-sm text-gray-600 mb-1"><span>Engagement</span><span>85%</span></div>
+            <div class="w-full bg-gray-200 rounded-full h-2"><div class="bg-green-500 h-2 rounded-full" style="width:85%"></div></div>
+          </div>
+          <div>
+            <div class="flex justify-between text-sm text-gray-600 mb-1"><span>Clarity</span><span>92%</span></div>
+            <div class="w-full bg-gray-200 rounded-full h-2"><div class="bg-blue-500 h-2 rounded-full" style="width:92%"></div></div>
+          </div>
+          <div>
+            <div class="flex justify-between text-sm text-gray-600 mb-1"><span>Readability</span><span>78%</span></div>
+            <div class="w-full bg-gray-200 rounded-full h-2"><div class="bg-yellow-500 h-2 rounded-full" style="width:78%"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tone Selector -->
+      <div class="bg-white rounded-2xl shadow-lg p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Tone & Style</h3>
+        <div class="grid grid-cols-2 gap-2 text-sm">
+          <button class="px-3 py-2 rounded-lg border border-gray-200 hover:bg-gray-50">Conversational</button>
+          <button class="px-3 py-2 rounded-lg border border-gray-200 hover:bg-gray-50">Professional</button>
+          <button class="px-3 py-2 rounded-lg border border-gray-200 hover:bg-gray-50">Witty</button>
+          <button class="px-3 py-2 rounded-lg border border-gray-200 hover:bg-gray-50">Inspirational</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="main.js"></script>
 </body>
 </html>
