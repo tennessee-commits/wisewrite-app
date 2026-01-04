@@ -1,130 +1,155 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <title>WiseWrite</title>
-  <link rel="stylesheet" href="resources/style.css"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WriteWise – Transform Your X Writing with AI-Powered Analytics</title>
+
+  <!-- CSS & CDN HEAD -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.12/typed.min.js"></script>
+  <script src="https://unpkg.com/splitting@1.0.6/dist/splitting.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/splitting@1.0.6/dist/splitting.css">
+  <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --deep-slate: #2D3748;
+      --warm-coral: #FF6B6B;
+      --soft-sage: #68D391;
+      --neutral-gray: #718096;
+      --light-gray: #F7FAFC;
+      --charcoal: #1A202C;
+    }
+    body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); }
+    .font-display { font-family: 'Playfair Display', serif; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .hero-bg {
+      background: linear-gradient(135deg, rgba(45, 55, 72, 0.05) 0%, rgba(255, 107, 107, 0.05) 50%, rgba(104, 211, 145, 0.05) 100%);
+    }
+    .floating-icon { animation: float 6s ease-in-out infinite; }
+    .floating-icon:nth-child(2) { animation-delay: -2s; }
+    .floating-icon:nth-child(3) { animation-delay: -4s; }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(5deg); }
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, var(--warm-coral) 0%, var(--soft-sage) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .card-hover { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .card-hover:hover { transform: translateY(-8px) rotateX(5deg); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15); }
+    .metric-card {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+      backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .nav-blur { backdrop-filter: blur(20px); background: rgba(255, 255, 255, 0.9); }
+    .reveal-element { opacity: 0.9; transform: translateY(20px); transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+    .reveal-element.revealed { opacity: 1; transform: translateY(0); }
+    .typewriter-cursor { animation: blink 1s infinite; }
+    @keyframes blink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
+    .feature-icon {
+      background: linear-gradient(135deg, var(--warm-coral) 0%, var(--soft-sage) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    img { background:#f3f4f6; } /* placeholder color while loading */
+  </style>
 </head>
-<body>
-  <h1>WiseWrite</h1>
-  <nav>
-    <a href="dashboard.html">Dashboard</a>
-    <a href="assistant.html">Assistant</a>
-    <a href="challenges.html">Challenges</a>
+<body class="text-gray-800">
+  <!-- NAV -->
+  <nav class="fixed top-0 left-0 right-0 z-50 nav-blur border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center space-x-2">
+          <div class="w-8 h-8 bg-gradient-to-r from-red-400 to-green-400 rounded-lg flex items-center justify-center"><span class="text-white font-bold text-sm">W</span></div>
+          <span class="font-display font-semibold text-xl text-gray-900">WriteWise</span>
+        </div>
+        <div class="hidden md:flex items-center space-x-8">
+          <a href="#features" class="text-gray-600 hover:text-red-400 transition-colors duration-200">Features</a>
+          <a href="#analytics" class="text-gray-600 hover:text-red-400 transition-colors duration-200">Analytics</a>
+          <a href="#challenges" class="text-gray-600 hover:text-red-400 transition-colors duration-200">Challenges</a>
+          <a href="#pricing" class="text-gray-600 hover:text-red-400 transition-colors duration-200">Pricing</a>
+        </div>
+        <div class="flex items-center space-x-4">
+          <button class="text-gray-600 hover:text-red-400 transition-colors duration-200">Sign In</button>
+          <button class="bg-red-400 hover:bg-red-500 text-white px-6 py-2 rounded-lg font-medium transition-colors duration-200">Start Free Trial</button>
+        </div>
+      </div>
+    </div>
   </nav>
-  <p>Local-first writing suite with analytics & daily challenges.</p>
-  <script src="main.js"></script>
-</body>
-</html>
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8"/>
-  <title>Dashboard – WiseWrite</title>
-  <link rel="stylesheet" href="resources/style.css"/>
-</head>
-<body>
-  <h1>Dashboard</h1>
-  <nav><a href="index.html">← Home</a></nav>
-  <section id="stats">
-    <div>Total Words: <span id="totalWords">0</span></div>
-    <div>Streak: <span id="streak">0</span> days</div>
+
+  <!-- HERO -->
+  <section class="pt-24 pb-16 hero-bg relative overflow-hidden">
+    <div class="absolute inset-0 pointer-events-none">
+      <div class="floating-icon absolute top-20 left-10 text-4xl opacity-20">✍️</div>
+      <div class="floating-icon absolute top-40 right-20 text-3xl opacity-20">📊</div>
+      <div class="floating-icon absolute bottom-32 left-1/4 text-2xl opacity-20">🎯</div>
+      <div class="floating-icon absolute top-1/3 right-1/3 text-3xl opacity-20">📈</div>
+    </div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div class="grid lg:grid-cols-2 gap-12 items-center">
+        <div class="reveal-element">
+          <h1 class="font-display text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">Transform Your <span class="gradient-text">X Writing</span> with AI-Powered Analytics</h1>
+          <div class="text-xl text-gray-600 mb-8 leading-relaxed"><span id="typed-text"></span><span class="typewriter-cursor">|</span></div>
+          <div class="flex flex-col sm:flex-row gap-4 mb-12">
+            <button class="bg-red-400 hover:bg-red-500 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-200 transform hover:scale-105">Try WriteWise Free</button>
+            <button class="border-2 border-gray-300 hover:border-red-400 text-gray-700 hover:text-red-400 px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-200">Watch Demo</button>
+          </div>
+          <div class="flex items-center space-x-8 text-sm text-gray-500">
+            <div class="flex items-center space-x-2"><div class="w-2 h-2 bg-green-400 rounded-full"></div><span>Free 14-day trial</span></div>
+            <div class="flex items-center space-x-2"><div class="w-2 h-2 bg-green-400 rounded-full"></div><span>No credit card required</span></div>
+          </div>
+        </div>
+        <div class="reveal-element">
+          <div class="relative">
+            <!-- FIXED IMAGE 1: hero/workspace -->
+            <img src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=800&q=60" alt="Modern writing workspace with analytics" class="rounded-2xl shadow-2xl w-full">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-2xl"></div>
+          </div>
+        </div>
+      </div>
+    </div>
   </section>
-  <canvas id="chart" width="400" height="200"></canvas>
-  <script src="main.js"></script>
+
+  <!-- PROBLEM STATEMENT -->
+  <section class="py-20 bg-white"><div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"><div class="text-center mb-16 reveal-element"><h2 class="font-display text-4xl font-bold text-gray-900 mb-6">Content Creators Struggle with Writing Improvement</h2><p class="text-xl text-gray-600 max-w-3xl mx-auto">Despite spending hours crafting content, most X creators lack data-driven insights to improve their writing. They're left guessing what works.</p></div><div class="grid md:grid-cols-3 gap-8"><div class="metric-card p-8 rounded-2xl card-hover reveal-element"><div class="text-4xl mb-4">📉</div><h3 class="font-semibold text-xl text-gray-900 mb-3">73% of creators</h3><p class="text-gray-600">don't track writing metrics or improvement over time</p></div><div class="metric-card p-8 rounded-2xl card-hover reveal-element"><div class="text-4xl mb-4">⏱️</div><h3 class="font-semibold text-xl text-gray-900 mb-3">4+ hours daily</h3><p class="text-gray-600">spent writing without feedback or optimization</p></div><div class="metric-card p-8 rounded-2xl card-hover reveal-element"><div class="text-4xl mb-4">🎯</div><h3 class="font-semibold text-xl text-gray-900 mb-3">25% improvement</h3><p class="text-gray-600">in engagement possible with data-driven writing</p></div></div></div></section>
+
+  <!-- CORE FEATURES -->
+  <section id="features" class="py-20 bg-gray-50"><div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"><div class="text-center mb-16 reveal-element"><h2 class="font-display text-4xl font-bold text-gray-900 mb-6">Everything You Need to Master X Writing</h2><p class="text-xl text-gray-600 max-w-3xl mx-auto">From real-time feedback to predictive analytics, WriteWise provides comprehensive tools for writing improvement.</p></div>
+    <div class="grid lg:grid-cols-2 gap-16 items-center mb-20"><div class="reveal-element"><h3 class="font-display text-3xl font-bold text-gray-900 mb-6">Real-Time Writing Analytics</h3><p class="text-lg text-gray-600 mb-8">Get instant feedback on clarity, engagement potential, and style consistency as you write. Our AI analyzes your content in real-time, providing actionable suggestions to improve your writing before you hit publish.</p><div class="space-y-4"><div class="flex items-center space-x-4"><div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center"><span class="text-green-600 text-sm">✓</span></div><span class="text-gray-700">Clarity scoring and readability analysis</span></div><div class="flex items-center space-x-4"><div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center"><span class="text-green-600 text-sm">✓</span></div><span class="text-gray-700">Engagement prediction algorithms</span></div><div class="flex items-center space-x-4"><div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center"><span class="text-green-600 text-sm">✓</span></div><span class="text-gray-700">Style consistency tracking</span></div></div></div><div class="reveal-element"><div class="relative"><!-- FIXED IMAGE 2: analytics dashboard --><img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=60" alt="Analytics dashboard preview" class="rounded-2xl shadow-xl w-full"><div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-2xl"></div></div></div></div>
+    <div class="grid lg:grid-cols-2 gap-16 items-center mb-20"><div class="reveal-element order-2 lg:order-1"><div class="relative"><!-- FIXED IMAGE 3: AI assistant interface --><img src="https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?auto=format&fit=crop&w=800&q=60" alt="AI writing assistant interface" class="rounded-2xl shadow-xl w-full"><div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-2xl"></div></div></div><div class="reveal-element order-1 lg:order-2"><h3 class="font-display text-3xl font-bold text-gray-900 mb-6">AI Writing Assistant</h3><p class="text-lg text-gray-600 mb-8">Advanced AI provides instant suggestions, alternative phrasings, and optimization recommendations while you write. Improve clarity, boost engagement, and maintain your unique voice.</p><div class="space-y-4"><div class="flex items-center space-x-4"><div class="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center"><span class="text-red-600 text-sm">✨</span></div><span class="text-gray-700">Smart rewriting suggestions</span></div><div class="flex items-center space-x-4"><div class="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center"><span class="text-red-600 text-sm">✨</span></div><span class="text-gray-700">Tone and voice optimization</span></div><div class="flex items-center space-x-4"><div class="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center"><span class="text-red-600 text-sm">✨</span></div><span class="text-gray-700">Performance prediction</span></div></div></div></div>
+    <div class="grid lg:grid-cols-2 gap-16 items-center"><div class="reveal-element"><h3 class="font-display text-3xl font-bold text-gray-900 mb-6">30-Day Writing Challenges</h3><p class="text-lg text-gray-600 mb-8">Gamified daily challenges designed to improve specific writing skills. Track your progress, earn achievements, and build consistent writing habits that drive real improvement.</p><div class="space-y-4"><div class="flex items-center space-x-4"><div class="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center"><span class="text-yellow-600 text-sm">🏆</span></div><span class="text-gray-700">Daily skill-building exercises</span></div><div class="flex items-center space-x-4"><div class="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center"><span class="text-yellow-600 text-sm">🏆</span></div><span class="text-gray-700">Achievement badges and streaks</span></div><div class="flex items-center space-x-4"><div class="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center"><span class="text-yellow-600 text-sm">🏆</span></div><span class="text-gray-700">Progress tracking and analytics</span></div></div></div><div class="reveal-element"><div class="relative"><img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=60" alt="Writing challenges and gamification" class="rounded-2xl shadow-xl w-full"><div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-2xl"></div></div></div></div>
+  </section>
+
+  <!-- SUCCESS STORIES -->
+  <section class="py-20 bg-gray-50"><div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"><div class="text-center mb-16 reveal-element"><h2 class="font-display text-4xl font-bold text-gray-900 mb-6">Trusted by Top X Creators</h2><p class="text-xl text-gray-600 max-w-3xl mx-auto">See how WriteWise has helped content creators improve their writing and grow their audience.</p></div><div class="splide" id="testimonials-slider"><div class="splide__track"><ul class="splide__list"><li class="splide__slide"><div class="bg-white p-8 rounded-2xl shadow-lg mx-4"><div class="flex items-center mb-6"><img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=64&h=64&fit=crop&crop=face" alt="Sarah Chen" class="w-16 h-16 rounded-full mr-4"><div><h4 class="font-semibold text-gray-900">Sarah Chen</h4><p class="text-gray-600">Tech Creator • 125K followers</p></div></div><p class="text-gray-700 mb-4">"WriteWise helped me understand why some posts performed better than others. My engagement rate increased by 40% in just two months."</p><div class="flex items-center space-x-4 text-sm text-gray-500"><span>Engagement: +40%</span><span>•</span><span>Writing Score: 89%</span></div></div></li><li class="splide__slide"><div class="bg-white p-8 rounded-2xl shadow-lg mx-4"><div class="flex items-center mb-6"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=64&h=64&fit=crop&crop=face" alt="Marcus Johnson" class="w-16 h-16 rounded-full mr-4"><div><h4 class="font-semibold text-gray-900">Marcus Johnson</h4><p class="text-gray-600">Business Coach • 89K followers</p></div></div><p class="text-gray-700 mb-4">"The AI writing assistant is like having a professional editor by your side. My writing has become clearer and more engaging."</p><div class="flex items-center space-x-4 text-sm text-gray-500"><span>Clarity: +35%</span><span>•</span><span>Follower Growth: +25%</span></div></div></li><li class="splide__slide"><div class="bg-white p-8 rounded-2xl shadow-lg mx-4"><div class="flex items-center mb-6"><img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=64&h=64&fit=crop&crop=face" alt="Emma Rodriguez" class="w-16 h-16 rounded-full mr-4"><div><h4 class="font-semibold text-gray-900">Emma Rodriguez</h4><p class="text-gray-600">Lifestyle Creator • 156K followers</p></div></div><p class="text-gray-700 mb-4">"The daily challenges kept me consistent and helped me develop better writing habits. I actually look forward to writing now."</p><div class="flex items-center space-x-4 text-sm text-gray-500"><span>Consistency: 30 days</span><span>•</span><span>Writing Streak: 45 days</span></div></div></li></ul></div></div></div>
+  </section>
+
+  <!-- PRICING -->
+  <section id="pricing" class="py-20 bg-white"><div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"><div class="text-center mb-16 reveal-element"><h2 class="font-display text-4xl font-bold text-gray-900 mb-6">Simple, Transparent Pricing</h2><p class="text-xl text-gray-600 max-w-3xl mx-auto">Start free, upgrade when you're ready to unlock advanced features.</p></div><div class="grid md:grid-cols-3 gap-8"><!-- Free --><div class="metric-card p-8 rounded-2xl card-hover reveal-element"><div class="text-center mb-8"><h3 class="font-semibold text-2xl text-gray-900 mb-2">Free</h3><div class="text-4xl font-bold text-gray-900 mb-2">$0</div><p class="text-gray-600">Forever</p></div><ul class="space-y-4 mb-8"><li class="flex items-center space-x-3"><div class="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center"><span class="text-green-600 text-xs">✓</span></div><span class="text-gray-700">Basic writing analytics</span></li><li class="flex items-center space-x-3"><div class="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center"><span class="text-green-600 text-xs">✓</span></div><span class="text-gray-700">5 AI suggestions per day</span></li><li class="flex items-center space-x-3"><div class="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center"><span class="text-green-600 text-xs">✓</span></div><span class="text-gray-700">Basic challenges</span></li><li class="flex items-center space-x-3"><div class="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center"><span class="text-green-600 text-xs">✓</span></div><span class="text-gray-700">Community access</span></li></ul><button class="w-full border-2 border-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:border-red-400 hover:text-red-400 transition-colors duration-200">Get Started Free</button></div><!-- Pro --><div class="metric-card p-8 rounded-2xl card-hover reveal-element border-2 border-red-400 relative"><div class="absolute -top-4 left-1/2 transform -translate-x-1/2"><span class="bg-red-400 text-white px-4 py-1 rounded-full text-sm font-semibold">Most Popular</span></div><div class="text-center mb-8"><h3 class="font-semibold text-2xl text-gray-900 mb-2">Pro</h3><div class="text-4xl font-bold text-gray-900 mb-2">$29</div><p class="text-gray-600">per month</p></div><ul class="space-y-4 mb-8"><li class="flex items-center space-x-3"><div class="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center"><span class="text-green-600 text-xs">✓</span></div><span class="text-gray-700">Advanced writing analytics</span></li><li class="flex items-center space-x-3"><div class="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center"><span class="text-green-600 text-xs">✓</span></div><span class="text-gray-700">Unlimited AI suggestions</span></li><li class="flex items-center space-x-3"><div class="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center"><span class="text-green-600 text-xs">✓</span></div><span class="text-gray-700">Performance prediction</span></li><li class="flex items-center space-x-3"><div class="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center"><span class="text-green-600 text-xs">✓</span></div><span class="text-gray-700">All challenges & badges</span></li><li class="flex items-center space-x-3"><div class="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center"><span class="text-green-600 text-xs">✓</span></div><span class="text-gray-700">Priority support</span></li></ul><button class="w-full bg-red-400 hover:bg-red-500 text-white py-3 rounded-lg font-semibold transition-colors duration-200">Start Pro Trial</button></div><!-- Enterprise --><div class="metric-card p-8 rounded-2xl card-hover reveal-element"><div class="text-center mb-8"><h3 class="font-semibold text-2xl text-gray-900 mb-2">Enterprise</h3><div class="text-4xl font-bold text-gray-900 mb-2">$99</div><p class="text-gray-600">per month</p></div><ul class="space-y-4 mb-8"><li class="flex items-center space-x-3"><div class="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center"><span class="text-green-600 text-xs">✓</span></div><span class="text-gray-700">Everything in Pro</span></li><li class="flex items-center space-x-3"><div class="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center"><span class="text-green-600 text-xs">✓</span></div><span class="text-gray-700">Team collaboration</span></li><li class="flex items-center space-x-3"><div class="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center"><span class="text-green-600 text-xs">✓</span></div><span class="text-gray-700">Custom integrations</span></li><li class="flex items-center space-x-3"><div class="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center"><span class="text-green-600 text-xs">✓</span></div><span class="text-gray-700">Advanced reporting</span></li><li class="flex items-center space-x-3"><div class="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center"><span class="text-green-600 text-xs">✓</span></div><span class="text-gray-700">Dedicated support</span></li></ul><button class="w-full border-2 border-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:border-red-400 hover:text-red-400 transition-colors duration-200">Contact Sales</button></div></div></div>
+  </section>
+
+  <!-- CTA -->
+  <section class="py-20 bg-gradient-to-r from-red-400 to-pink-400"><div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8"><h2 class="font-display text-4xl font-bold text-white mb-6">Ready to Transform Your Writing?</h2><p class="text-xl text-red-100 mb-8">Join thousands of content creators who are already using WriteWise to improve their writing and grow their audience.</p><div class="flex flex-col sm:flex-row gap-4 justify-center"><button class="bg-white text-red-400 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-50 transition-colors duration-200">Start Your Free Trial</button><button class="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-red-400 transition-colors duration-200">Schedule Demo</button></div><p class="text-sm text-red-100 mt-6">No credit card required • 14-day free trial • Cancel anytime</p></div></section>
+
+  <!-- FOOTER -->
+  <footer class="bg-gray-900 text-white py-12"><div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"><div class="flex flex-col md:flex-row justify-between items-center"><div class="flex items-center space-x-2 mb-4 md:mb-0"><div class="w-8 h-8 bg-gradient-to-r from-red-400 to-green-400 rounded-lg flex items-center justify-center"><span class="text-white font-bold text-sm">W</span></div><span class="font-display font-semibold text-xl">WriteWise</span></div><p class="text-gray-400 text-sm">© 2025 WriteWise. All rights reserved. Built for content creators who want to write better.</p></div></div></footer>
+
+  <!-- JS PLUGINS -->
+  <script>
+    new Typed('#typed-text', { strings: ['Get instant AI feedback on your writing.','Improve clarity & boost engagement.','Track progress with analytics.'], typeSpeed: 40, backSpeed: 30, loop: true, showCursor: false });
+    Splitting({ target: '.reveal-element', by: 'lines' });
+    new Splide('#testimonials-slider',{ perPage: 1, gap: '1rem', arrows: false, pagination: true, autoplay: true }).mount();
+    const io = new IntersectionObserver((entries) => entries.forEach(e => e.target.classList.toggle('revealed', e.isIntersecting)));
+    document.querySelectorAll('.reveal-element').forEach(el => io.observe(el));
+  </script>
 </body>
 </html>
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8"/>
-  <title>Writing Assistant – WiseWrite</title>
-  <link rel="stylesheet" href="resources/style.css"/>
-</head>
-<body>
-  <h1>Writing Assistant</h1>
-  <nav><a href="index.html">← Home</a></nav>
-  <textarea id="editor" placeholder="Start writing…"></textarea>
-  <div id="status">Auto-saved locally</div>
-  <script src="main.js"></script>
-</body>
-</html>
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8"/>
- <title>Challenges – WiseWrite</title>
-  <link rel="stylesheet" href="resources/style.css"/>
-</head>
-<body>
-  <h1>Daily Challenge</h1>
-  <nav><a href="index.html">← Home</a></nav>
-  <p id="prompt">Loading…</p>
-  <textarea id="challengeEditor" placeholder="15-minute sprint…"></textarea>
-  <button id="submit">Mark Complete</button>
-  <div id="xp">XP: <span id="xpValue">0</span></div>
-  <script src="main.js"></script>
-</body>
-</html>
-// WiseWrite unified JS – public domain
-const words = str => str.trim().split(/\s+/).filter(w => w.length > 0).length;
-const saveKey = (page, key) => `ww_${page}_${key}`;
-
-/* ----- assistant ----- */
-if (document.getElementById('editor')) {
-  const ed = document.getElementById('editor');
-  const status = document.getElementById('status');
-  ed.value = localStorage.getItem(saveKey('assist','draft')) || '';
-  ed.addEventListener('input', () => {
-    localStorage.setItem(saveKey('assist','draft'), ed.value);
-    status.textContent = 'Saved '+new Date().toLocaleTimeString();
-  });
-}
-
-/* ----- challenges ----- */
-const prompts = [
-  "Write the ad that would make your 12-year-old self cry happy tears.",
-  "Describe the smell of your first victory.",
-  "Two characters swap bodies for 24 h—what’s the first thing each breaks?",
-  "A thrift-store find starts talking at 3 a.m. What does it want?",
-  "Invent a new holiday that costs zero dollars."
-];
-if (document.getElementById('prompt')) {
-  const today = new Date().getDay();
-  document.getElementById('prompt').textContent = prompts[today % prompts.length];
-  const xpSpan = document.getElementById('xpValue');
-  let xp = +(localStorage.getItem(saveKey('chall','xp')) || 0);
-  xpSpan.textContent = xp;
-  document.getElementById('submit').onclick = () => {
-    xp += 100;
-    localStorage.setItem(saveKey('chall','xp'), xp);
-    xpSpan.textContent = xp;
-    alert('Challenge logged! +100 XP');
-  };
-}
-
-/* ----- dashboard ----- */
-if (document.getElementById('totalWords')) {
-  const allKeys = Object.keys(localStorage).filter(k => k.startsWith('ww_'));
-  let total = 0;
-  allKeys.forEach(k => total += words(localStorage.getItem(k) || ''));
-  document.getElementById('totalWords').textContent = total;
-  const streak = +(localStorage.getItem(saveKey('dash','streak')) || 0);
-  document.getElementById('streak').textContent = streak;
-  // mini bar chart mock
-  const canvas = document.getElementById('chart');
-  const ctx = canvas.getContext('2d');
-  const data = [total, total+10, total-5, total+20, total+5, total+15, total];
-  const barW = 50, gap = 5;
-  data.forEach((h, i) => {
-    ctx.fillStyle = '#00bcd4';
-    ctx.fillRect(i*(barW+gap), canvas.height-h, barW, h);
-  });
-}
-body{font-family:system-ui, sans-serif; margin:0; padding:2rem; background:#111; color:#eee;}
-nav a{color:#00bcd4; margin-right:1rem; text-decoration:none;}
-textarea{width:100%; height:60vh; font-size:1.2rem; background:#1e1e1e; color:#eee; border:1px solid #333;}
-button{padding:.5rem 1rem; background:#00bcd4; border:none; color:#111; font-weight:bold; cursor:pointer;}
-#status{font-size:.8rem; color:#888; margin-top:.3rem;}
-#stats{display:flex; gap:2rem; margin-bottom:1rem;}
-{"rewrites":[{"source":"/(.*)","destination":"/$1"}]}
