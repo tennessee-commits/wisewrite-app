@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>WiseWrite</title>
+  <link rel="stylesheet" href="resources/style.css"/>
+</head>
+<body>
+  <h1>WiseWrite</h1>
+  <nav>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="assistant.html">Assistant</a>
+    <a href="challenges.html">Challenges</a>
+  </nav>
+  <p>Local-first writing suite with analytics & daily challenges.</p>
+  <script src="main.js"></script>
+</body>
+</html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Dashboard – WiseWrite</title>
+  <link rel="stylesheet" href="resources/style.css"/>
+</head>
+<body>
+  <h1>Dashboard</h1>
+  <nav><a href="index.html">← Home</a></nav>
+  <section id="stats">
+    <div>Total Words: <span id="totalWords">0</span></div>
+    <div>Streak: <span id="streak">0</span> days</div>
+  </section>
+  <canvas id="chart" width="400" height="200"></canvas>
+  <script src="main.js"></script>
+</body>
+</html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Writing Assistant – WiseWrite</title>
+  <link rel="stylesheet" href="resources/style.css"/>
+</head>
+<body>
+  <h1>Writing Assistant</h1>
+  <nav><a href="index.html">← Home</a></nav>
+  <textarea id="editor" placeholder="Start writing…"></textarea>
+  <div id="status">Auto-saved locally</div>
+  <script src="main.js"></script>
+</body>
+</html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+ <title>Challenges – WiseWrite</title>
+  <link rel="stylesheet" href="resources/style.css"/>
+</head>
+<body>
+  <h1>Daily Challenge</h1>
+  <nav><a href="index.html">← Home</a></nav>
+  <p id="prompt">Loading…</p>
+  <textarea id="challengeEditor" placeholder="15-minute sprint…"></textarea>
+  <button id="submit">Mark Complete</button>
+  <div id="xp">XP: <span id="xpValue">0</span></div>
+  <script src="main.js"></script>
+</body>
+</html>
+// WiseWrite unified JS – public domain
+const words = str => str.trim().split(/\s+/).filter(w => w.length > 0).length;
+const saveKey = (page, key) => `ww_${page}_${key}`;
+
+/* ----- assistant ----- */
+if (document.getElementById('editor')) {
+  const ed = document.getElementById('editor');
+  const status = document.getElementById('status');
+  ed.value = localStorage.getItem(saveKey('assist','draft')) || '';
+  ed.addEventListener('input', () => {
+    localStorage.setItem(saveKey('assist','draft'), ed.value);
+    status.textContent = 'Saved '+new Date().toLocaleTimeString();
+  });
+}
+
+/* ----- challenges ----- */
+const prompts = [
+  "Write the ad that would make your 12-year-old self cry happy tears.",
+  "Describe the smell of your first victory.",
+  "Two characters swap bodies for 24 h—what’s the first thing each breaks?",
+  "A thrift-store find starts talking at 3 a.m. What does it want?",
+  "Invent a new holiday that costs zero dollars."
+];
+if (document.getElementById('prompt')) {
+  const today = new Date().getDay();
+  document.getElementById('prompt').textContent = prompts[today % prompts.length];
+  const xpSpan = document.getElementById('xpValue');
+  let xp = +(localStorage.getItem(saveKey('chall','xp')) || 0);
+  xpSpan.textContent = xp;
+  document.getElementById('submit').onclick = () => {
+    xp += 100;
+    localStorage.setItem(saveKey('chall','xp'), xp);
+    xpSpan.textContent = xp;
+    alert('Challenge logged! +100 XP');
+  };
+}
+
+/* ----- dashboard ----- */
+if (document.getElementById('totalWords')) {
+  const allKeys = Object.keys(localStorage).filter(k => k.startsWith('ww_'));
+  let total = 0;
+  allKeys.forEach(k => total += words(localStorage.getItem(k) || ''));
+  document.getElementById('totalWords').textContent = total;
+  const streak = +(localStorage.getItem(saveKey('dash','streak')) || 0);
+  document.getElementById('streak').textContent = streak;
+  // mini bar chart mock
+  const canvas = document.getElementById('chart');
+  const ctx = canvas.getContext('2d');
+  const data = [total, total+10, total-5, total+20, total+5, total+15, total];
+  const barW = 50, gap = 5;
+  data.forEach((h, i) => {
+    ctx.fillStyle = '#00bcd4';
+    ctx.fillRect(i*(barW+gap), canvas.height-h, barW, h);
+  });
+}
+body{font-family:system-ui, sans-serif; margin:0; padding:2rem; background:#111; color:#eee;}
+nav a{color:#00bcd4; margin-right:1rem; text-decoration:none;}
+textarea{width:100%; height:60vh; font-size:1.2rem; background:#1e1e1e; color:#eee; border:1px solid #333;}
+button{padding:.5rem 1rem; background:#00bcd4; border:none; color:#111; font-weight:bold; cursor:pointer;}
+#status{font-size:.8rem; color:#888; margin-top:.3rem;}
+#stats{display:flex; gap:2rem; margin-bottom:1rem;}
+{"rewrites":[{"source":"/(.*)","destination":"/$1"}]}

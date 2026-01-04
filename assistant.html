@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Writing Assistant - WriteWise</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.12/typed.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --deep-slate: #2D3748;
+            --warm-coral: #FF6B6B;
+            --soft-sage: #68D391;
+            --neutral-gray: #718096;
+            --light-gray: #F7FAFC;
+            --charcoal: #1A202C;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        }
+        
+        .font-display { font-family: 'Playfair Display', serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        
+        .assistant-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .writing-editor {
+            min-height: 400px;
+            resize: none;
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            transition: all 0.3s ease;
+        }
+        
+        .writing-editor:focus {
+            outline: none;
+            border-color: var(--warm-coral);
+            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+        }
+        
+        .suggestion-item {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .suggestion-item:hover {
+            transform: translateX(4px);
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.05) 0%, rgba(255, 255, 255, 0.8) 100%);
+        }
+        
+        .performance-meter {
+            background: linear-gradient(90deg, #ef4444 0%, #f59e0b 50%, #10b981 100%);
+            height: 8px;
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .performance-indicator {
+            position: absolute;
+            top: -2px;
+            width: 12px;
+            height: 12px;
+            background: white;
+            border: 2px solid #374151;
+            border-radius: 50%;
+            transform: translateX(-50%);
+            transition: left 0.5s ease;
+        }
+        
+        .typing-indicator {
+            animation: typing 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes typing {
+            0%, 60%, 100% { opacity: 0.3; }
+            30% { opacity: 1; }
+        }
+        
+        .nav-blur {
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        .floating-suggestion {
+            animation: float-in 0.5s ease-out;
+        }
+        
+        @keyframes float-in {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .highlight-improvement {
+            background: linear-gradient(120deg, rgba(255, 107, 107, 0.2) 0%, rgba(255, 107, 107, 0.1) 100%);
+            border-radius: 3px;
+            padding: 1px 2px;
+        }
+        
+        .word-count-pulse {
+            animation: pulse-green 2s infinite;
+        }
+        
+        @keyframes pulse-green {
+            0%, 100% { color: #10b981; }
+            50% { color: #059669; }
+        }
+    </style>
+</head>
+<body class="text-gray-800 bg-gray-50">
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 nav-blur border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-gradient-to-r from-red-400 to-green-400 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">W</span>
+                    </div>
+                    <span class="font-display font-semibold text-xl text-gray-900">WriteWise</span>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="dashboard.html" class="text-gray-600 hover:text-red-400 transition-colors duration-200">Dashboard</a>
+                    <a href="assistant.html" class="text-red-400 font-medium">Assistant</a>
+                    <a href="challenges.html" class="text-gray-600 hover:text-red-400 transition-colors duration-200">Challenges</a>
+                    <a href="index.html#pricing" class="text-gray-600 hover:text-red-400 transition-colors duration-200">Upgrade</a>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <button class="text-gray-600 hover:text-red-400 transition-colors duration-200">Save Draft</button>
+                    <div class="w-8 h-8 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full"></div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Assistant Header -->
+    <section class="pt-24 pb-8 bg-gradient-to-r from-blue-50 to-purple-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h1 class="font-display text-4xl font-bold text-gray-900 mb-4">
+                    AI Writing Assistant
+                </h1>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Get real-time feedback, suggestions, and performance predictions as you write
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Writing Interface -->
+    <section class="py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-3 gap-8">
+                <!-- Left Panel: Writing Tools -->
+                <div class="space-y-6">
+                    <div class="assistant-card p-6 rounded-2xl">
+                        <h3 class="font-semibold text-lg text-gray-900 mb-4">Writing Settings</h3>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Content Type</label>
+                                <select class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-400 focus:border-red-400">
+                                    <option>Single Post</option>
+                                    <option>Thread</option>
+                                    <option>Reply</option>
+                                    <option>Long-form</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Tone</label>
+                                <select class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-400 focus:border-red-400">
+                                    <option>Professional</option>
+                                    <option>Casual</option>
+                                    <option>Witty</option>
+                                    <option>Inspirational</option>
+                                    <option>Educational</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Target Audience</label>
+                                <select class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-400 focus:border-red-400">
+                                    <option>General</option>
+                                    <option>Professionals</option>
+                                    <option>Creators</option>
+                                    <option>Entrepreneurs</option>
+                                    <option>Developers</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Goal</label>
+                                <select class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-400 focus:border-red-400">
+                                    <option>Engagement</option>
+                                    <option>Education</option>
+                                    <option>Inspiration</option>
+                                    <option>Conversion</option>
+                                    <option>Discussion</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Writing Stats -->
+                    <div class="assistant-card p-6 rounded-2xl">
+                        <h3 class="font-semibold text-lg text-gray-900 mb-4">Live Stats</h3>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">Words</span>
+                                <span class="font-semibold text-gray-900" id="word-count">0</span>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">Characters</span>
+                                <span class="font-semibold text-gray-900" id="char-count">0</span>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">Reading time</span>
+                                <span class="font-semibold text-gray-900" id="reading-time">0s</span>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">Sentences</span>
+                                <span class="font-semibold text-gray-900" id="sentence-count">0</span>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">Avg. words/sentence</span>
+                                <span class="font-semibold text-gray-900" id="avg-words">0</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Prompts -->
+                    <div class="assistant-card p-6 rounded-2xl">
+                        <h3 class="font-semibold text-lg text-gray-900 mb-4">Need Inspiration?</h3>
+                        
+                        <div class="space-y-2">
+                            <button class="w-full text-left p-3 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors duration-200 prompt-btn">
+                                What's the biggest lesson you learned this week?
+                            </button>
+                            <button class="w-full text-left p-3 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors duration-200 prompt-btn">
+                                Share a mistake that taught you something valuable
+                            </button>
+                            <button class="w-full text-left p-3 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors duration-200 prompt-btn">
+                                What's one thing you wish you knew when you started?
+                            </button>
+                            <button class="w-full text-left p-3 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors duration-200 prompt-btn">
+                                How do you handle setbacks and challenges?
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Center Panel: Writing Editor -->
+                <div class="space-y-6">
+                    <div class="assistant-card p-6 rounded-2xl">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-semibold text-lg text-gray-900">Content Editor</h3>
+                            <div class="flex items-center space-x-2">
+                                <span class="text-sm text-gray-500">Auto-save</span>
+                                <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+                            </div>
+                        </div>
+                        
+                        <textarea 
+                            id="writing-editor" 
+                            class="writing-editor w-full p-4 border border-gray-300 rounded-lg resize-none"
+                            placeholder="Start writing your content here... Get real-time feedback and suggestions as you type."
+                        ></textarea>
+                        
+                        <div class="flex items-center justify-between mt-4">
+                            <div class="flex items-center space-x-4 text-sm text-gray-500">
+                                <span>Real-time analysis active</span>
+                                <div id="analysis-status" class="typing-indicator">
+                                    <span class="text-xs">AI is analyzing...</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center space-x-3">
+                                <button class="text-gray-500 hover:text-red-400 transition-colors duration-200" title="Clear">
+                                    🗑️
+                                </button>
+                                <button class="text-gray-500 hover:text-red-400 transition-colors duration-200" title="Copy">
+                                    📋
+                                </button>
+                                <button class="bg-red-400 hover:bg-red-500 text-white px-6 py-2 rounded-lg font-medium transition-colors duration-200">
+                                    Publish
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Performance Prediction -->
+                    <div class="assistant-card p-6 rounded-2xl">
+                        <h3 class="font-semibold text-lg text-gray-900 mb-4">Performance Prediction</h3>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm font-medium text-gray-700">Predicted Engagement</span>
+                                    <span class="text-sm font-semibold text-gray-900" id="engagement-score">85%</span>
+                                </div>
+                                <div class="performance-meter">
+                                    <div class="performance-indicator" id="engagement-indicator" style="left: 85%;"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-3 gap-4">
+                                <div class="text-center p-3 bg-gray-50 rounded-lg">
+                                    <div class="text-lg font-bold text-gray-900" id="predicted-likes">156</div>
+                                    <div class="text-xs text-gray-500">Est. Likes</div>
+                                </div>
+                                <div class="text-center p-3 bg-gray-50 rounded-lg">
+                                    <div class="text-lg font-bold text-gray-900" id="predicted-replies">12</div>
+                                    <div class="text-xs text-gray-500">Est. Replies</div>
+                                </div>
+                                <div class="text-center p-3 bg-gray-50 rounded-lg">
+                                    <div class="text-lg font-bold text-gray-900" id="predicted-retweets">23</div>
+                                    <div class="text-xs text-gray-500">Est. Retweets</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right Panel: AI Suggestions -->
+                <div class="space-y-6">
+                    <div class="assistant-card p-6 rounded-2xl">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-semibold text-lg text-gray-900">AI Suggestions</h3>
+                            <div class="text-sm text-gray-500">Live feedback</div>
+                        </div>
+                        
+                        <div id="suggestions-container" class="space-y-3">
+                            <div class="text-center py-8 text-gray-500">
+                                <div class="text-4xl mb-2">🤖</div>
+                                <p class="text-sm">Start writing to get AI suggestions</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Writing Score -->
+                    <div class="assistant-card p-6 rounded-2xl">
+                        <h3 class="font-semibold text-lg text-gray-900 mb-4">Writing Score</h3>
+                        
+                        <div class="text-center mb-4">
+                            <div class="text-4xl font-bold text-gray-900" id="overall-writing-score">--</div>
+                            <div class="text-sm text-gray-500">Overall quality</div>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <div>
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-sm text-gray-600">Clarity</span>
+                                    <span class="text-sm font-semibold text-gray-900" id="clarity-score">--</span>
+                                </div>
+                                <div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                                    <div class="h-full bg-green-400 rounded-full transition-all duration-500" id="clarity-bar" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-sm text-gray-600">Engagement</span>
+                                    <span class="text-sm font-semibold text-gray-900" id="engagement-quality-score">--</span>
+                                </div>
+                                <div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                                    <div class="h-full bg-red-400 rounded-full transition-all duration-500" id="engagement-bar" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-sm text-gray-600">Readability</span>
+                                    <span class="text-sm font-semibold text-gray-900" id="readability-score">--</span>
+                                </div>
+                                <div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                                    <div class="h-full bg-blue-400 rounded-full transition-all duration-500" id="readability-bar" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Improvements Applied -->
+                    <div class="assistant-card p-6 rounded-2xl">
+                        <h3 class="font-semibold text-lg text-gray-900 mb-4">Recent Improvements</h3>
+                        
+                        <div id="improvements-list" class="space-y-2">
+                            <div class="text-center py-4 text-gray-500">
+                                <p class="text-sm">Improvements will appear here</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Writing Tips -->
+                    <div class="assistant-card p-6 rounded-2xl">
+                        <h3 class="font-semibold text-lg text-gray-900 mb-4">Pro Tips</h3>
+                        
+                        <div class="space-y-3">
+                            <div class="p-3 bg-yellow-50 rounded-lg border-l-4 border-yellow-400">
+                                <p class="text-sm text-yellow-800">💡 Use active voice to make your writing more engaging</p>
+                            </div>
+                            <div class="p-3 bg-blue-50 rounded-lg border-l-4 border-blue-400">
+                                <p class="text-sm text-blue-800">📊 Posts with numbers get 36% more engagement</p>
+                            </div>
+                            <div class="p-3 bg-green-50 rounded-lg border-l-4 border-green-400">
+                                <p class="text-sm text-green-800">🎯 Keep sentences under 20 words for better readability</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center space-x-2 mb-4 md:mb-0">
+                    <div class="w-8 h-8 bg-gradient-to-r from-red-400 to-green-400 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">W</span>
+                    </div>
+                    <span class="font-display font-semibold text-xl">WriteWise</span>
+                </div>
+                
+                <p class="text-gray-400 text-sm">
+                    © 2025 WriteWise. All rights reserved. Built for content creators who want to write better.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize assistant
+        document.addEventListener('DOMContentLoaded', function() {
+            initWritingEditor();
+            initPromptButtons();
+            initPiñataSurprises();
+            
+            console.log('AI Assistant initialized with Piñata Protocol 🤖');
+        });
+
+        // Writing editor functionality
+        function initWritingEditor() {
+            const editor = document.getElementById('writing-editor');
+            const analysisStatus = document.getElementById('analysis-status');
+            let analysisTimeout;
+
+            editor.addEventListener('input', function() {
+                updateStats();
+                
+                // Show analysis status
+                analysisStatus.innerHTML = '<span class="text-xs text-orange-500">AI is analyzing...</span>';
+                analysisStatus.classList.add('typing-indicator');
+                
+                // Debounce AI analysis
+                clearTimeout(analysisTimeout);
+                analysisTimeout = setTimeout(() => {
+                    performAIAnalysis();
+                    analysisStatus.innerHTML = '<span class="text-xs text-green-500">Analysis complete</span>';
+                    analysisStatus.classList.remove('typing-indicator');
+                }, 1000);
+            });
+
+            // Update writing statistics
+            function updateStats() {
+                const text = editor.value;
+                const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+                const characters = text.length;
+                const sentences = text.trim() ? text.split(/[.!?]+/).filter(s => s.trim().length > 0).length : 0;
+                const avgWords = sentences > 0 ? Math.round(words / sentences) : 0;
+                const readingTime = Math.ceil(words / 200); // 200 words per minute
+
+                document.getElementById('word-count').textContent = words;
+                document.getElementById('char-count').textContent = characters;
+                document.getElementById('reading-time').textContent = readingTime + 'm';
+                document.getElementById('sentence-count').textContent = sentences;
+                document.getElementById('avg-words').textContent = avgWords;
+
+                // Animate word count when it changes significantly
+                const wordCountElement = document.getElementById('word-count');
+                if (words > 0 && words % 10 === 0) {
+                    wordCountElement.classList.add('word-count-pulse');
+                    setTimeout(() => {
+                        wordCountElement.classList.remove('word-count-pulse');
+                    }, 2000);
+                }
+            }
+        }
+
+        // AI Analysis function
+        function performAIAnalysis() {
+            const text = document.getElementById('writing-editor').value;
+            
+            if (!text.trim()) {
+                showEmptyState();
+                return;
+            }
+
+            // Simulate AI analysis with realistic delays
+            setTimeout(() => {
+                updateWritingScores(text);
+                generateSuggestions(text);
+                updatePerformancePrediction(text);
+            }, 500);
+        }
+
+        // Update writing scores
+        function updateWritingScores(text) {
+            // Simulate scoring based on text characteristics
+            const words = text.trim().split(/\s+/).length;
+            const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0).length;
+            const avgWordsPerSentence = sentences > 0 ? words / sentences : 0;
+            
+            // Calculate scores (simplified simulation)
+            const clarityScore = Math.min(95, Math.max(50, 80 + (avgWordsPerSentence < 20 ? 10 : -5)));
+            const engagementScore = Math.min(95, Math.max(50, 75 + (text.includes('?') ? 10 : 0) + (words > 50 ? 5 : -5)));
+            const readabilityScore = Math.min(95, Math.max(50, 85 - (avgWordsPerSentence > 25 ? 10 : 0)));
+            const overallScore = Math.round((clarityScore + engagementScore + readabilityScore) / 3);
+
+            // Animate score updates
+            animateScoreUpdate('overall-writing-score', overallScore);
+            animateScoreUpdate('clarity-score', Math.round(clarityScore));
+            animateScoreUpdate('engagement-quality-score', Math.round(engagementScore));
+            animateScoreUpdate('readability-score', Math.round(readabilityScore));
+
+            // Update progress bars
+            animateProgressBar('clarity-bar', clarityScore);
+            animateProgressBar('engagement-bar', engagementScore);
+            animateProgressBar('readability-bar', readabilityScore);
+        }
+
+        // Animate score updates
+        function animateScoreUpdate(elementId, targetScore) {
+            const element = document.getElementById(elementId);
+            const currentScore = parseInt(element.textContent) || 0;
+            
+            anime({
+                targets: { score: currentScore },
+                score: targetScore,
+                duration: 1000,
+                easing: 'easeOutCubic',
+                update: function(anim) {
+                    element.textContent = Math.round(anim.animatables[0].target.score);
+                }
+            });
+        }
+
+        // Animate progress bars
+        function animateProgressBar(barId, score) {
+            const bar = document.getElementById(barId);
+            const percentage = Math.max(0, Math.min(100, score));
+            
+            anime({
+                targets: bar,
+                width: percentage + '%',
+                duration: 1000,
+                easing: 'easeOutCubic'
+            });
+        }
+
+        // Generate AI suggestions
+        function generateSuggestions(text) {
+            const suggestions = [];
+            const words = text.trim().split(/\s+/).length;
+            const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0).length;
+            const avgWordsPerSentence = sentences > 0 ? words / sentences : 0;
+
+            // Generate contextual suggestions
+            if (avgWordsPerSentence > 25) {
+                suggestions.push({
+                    type: 'improvement',
+                    icon: '✂️',
+                    title: 'Sentence Length',
+                    description: 'Consider breaking long sentences into shorter ones for better readability.',
+                    suggestion: 'Try keeping sentences under 20 words.'
+                });
+            }
+
+            if (!text.includes('?') && words > 30) {
+                suggestions.push({
+                    type: 'engagement',
+                    icon: '❓',
+                    title: 'Add a Question',
+                    description: 'Questions increase engagement by encouraging responses.',
+                    suggestion: 'Try ending with a question to boost interaction.'
+                });
+            }
+
+            if (words < 30) {
+                suggestions.push({
+                    type: 'length',
+                    icon: '📝',
+                    title: 'Content Length',
+                    description: 'Your content might be too short for optimal engagement.',
+                    suggestion: 'Consider expanding your thoughts or adding more detail.'
+                });
+            }
+
+            if (!text.match(/\d/)) {
+                suggestions.push({
+                    type: 'engagement',
+                    icon: '🔢',
+                    title: 'Add Specific Numbers',
+                    description: 'Posts with numbers get 36% more engagement.',
+                    suggestion: 'Include specific data, percentages, or timeframes.'
+                });
+            }
+
+            // Always add a positive suggestion
+            suggestions.push({
+                type: 'positive',
+                icon: '✅',
+                title: 'What\'s Working',
+                description: 'Your writing has good clarity and structure.',
+                suggestion: 'Keep up the clear and concise communication style.'
+            });
+
+            displaySuggestions(suggestions);
+        }
+
+        // Display suggestions in the UI
+        function displaySuggestions(suggestions) {
+            const container = document.getElementById('suggestions-container');
+            container.innerHTML = '';
+
+            suggestions.forEach((suggestion, index) => {
+                const suggestionElement = document.createElement('div');
+                suggestionElement.className = 'suggestion-item p-4 bg-white rounded-lg border border-gray-100';
+                suggestionElement.innerHTML = `
+                    <div class="flex items-start space-x-3">
+                        <div class="text-lg">${suggestion.icon}</div>
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-sm text-gray-900 mb-1">${suggestion.title}</h4>
+                            <p class="text-xs text-gray-600 mb-2">${suggestion.description}</p>
+                            <p class="text-xs text-blue-600 font-medium">${suggestion.suggestion}</p>
+                        </div>
+                    </div>
+                `;
+
+                container.appendChild(suggestionElement);
+
+                // Animate suggestion appearance
+                setTimeout(() => {
+                    suggestionElement.classList.add('floating-suggestion');
+                }, index * 200);
+
+                // Add click handler for applying suggestions
+                suggestionElement.addEventListener('click', () => {
+                    applySuggestion(suggestion);
+                });
+            });
+        }
+
+        // Apply suggestion (simulate)
+        function applySuggestion(suggestion) {
+            const improvementsList = document.getElementById('improvements-list');
+            
+            if (improvementsList.querySelector('.text-center')) {
+                improvementsList.innerHTML = '';
+            }
+
+            const improvementElement = document.createElement('div');
+            improvementElement.className = 'flex items-center space-x-2 p-2 bg-green-50 rounded text-sm';
+            improvementElement.innerHTML = `
+                <span>${suggestion.icon}</span>
+                <span class="text-green-800">${suggestion.title}</span>
+            `;
+
+            improvementsList.insertBefore(improvementElement, improvementsList.firstChild);
+
+            // Animate improvement
+            anime({
+                targets: improvementElement,
+                translateX: [-20, 0],
+                opacity: [0, 1],
+                duration: 500,
+                easing: 'easeOutCubic'
+            });
+
+            // Show success feedback
+            showSuccessFeedback(suggestion.title);
+        }
+
+        // Show success feedback
+        function showSuccessFeedback(improvement) {
+            const feedback = document.createElement('div');
+            feedback.className = 'fixed top-20 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 text-sm font-medium';
+            feedback.textContent = `✓ ${improvement} applied!`;
+            
+            document.body.appendChild(feedback);
+            
+            anime({
+                targets: feedback,
+                translateX: [300, 0],
+                opacity: [0, 1],
+                duration: 300,
+                easing: 'easeOutCubic'
+            });
+            
+            setTimeout(() => {
+                anime({
+                    targets: feedback,
+                    translateX: [0, 300],
+                    opacity: [1, 0],
+                    duration: 300,
+                    easing: 'easeInCubic',
+                    complete: () => feedback.remove()
+                });
+            }, 2000);
+        }
+
+        // Update performance prediction
+        function updatePerformancePrediction(text) {
+            const words = text.trim().split(/\s+/).length;
+            const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0).length;
+            const hasQuestion = text.includes('?');
+            const hasNumbers = /\d/.test(text);
+            
+            // Simulate engagement prediction
+            let engagementScore = 70;
+            if (words > 30) engagementScore += 10;
+            if (hasQuestion) engagementScore += 15;
+            if (hasNumbers) engagementScore += 10;
+            if (sentences > 2) engagementScore += 5;
+            
+            engagementScore = Math.min(95, engagementScore);
+            
+            // Update UI
+            document.getElementById('engagement-score').textContent = engagementScore + '%';
+            document.getElementById('engagement-indicator').style.left = engagementScore + '%';
+            
+            // Predict metrics
+            const predictedLikes = Math.round(engagementScore * 1.8);
+            const predictedReplies = Math.round(engagementScore * 0.15);
+            const predictedRetweets = Math.round(engagementScore * 0.3);
+            
+            document.getElementById('predicted-likes').textContent = predictedLikes;
+            document.getElementById('predicted-replies').textContent = predictedReplies;
+            document.getElementById('predicted-retweets').textContent = predictedRetweets;
+        }
+
+        // Show empty state
+        function showEmptyState() {
+            const container = document.getElementById('suggestions-container');
+            container.innerHTML = `
+                <div class="text-center py-8 text-gray-500">
+                    <div class="text-4xl mb-2">🤖</div>
+                    <p class="text-sm">Start writing to get AI suggestions</p>
+                </div>
+            `;
+            
+            // Reset scores
+            ['overall-writing-score', 'clarity-score', 'engagement-quality-score', 'readability-score'].forEach(id => {
+                document.getElementById(id).textContent = '--';
+            });
+            
+            // Reset progress bars
+            ['clarity-bar', 'engagement-bar', 'readability-bar'].forEach(id => {
+                document.getElementById(id).style.width = '0%';
+            });
+        }
+
+        // Initialize prompt buttons
+        function initPromptButtons() {
+            const promptButtons = document.querySelectorAll('.prompt-btn');
+            const editor = document.getElementById('writing-editor');
+            
+            promptButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const prompt = this.textContent;
+                    editor.value = prompt + '\\n\\n';
+                    editor.focus();
+                    
+                    // Trigger input event to update analysis
+                    editor.dispatchEvent(new Event('input'));
+                    
+                    // Animate button selection
+                    anime({
+                        targets: this,
+                        scale: [1, 0.95, 1],
+                        duration: 200,
+                        easing: 'easeOutCubic'
+                    });
+                });
+            });
+        }
+
+        // Piñata Protocol surprises
+        function initPiñataSurprises() {
+            // Random inspirational messages during writing
+            const inspirationalMessages = [
+                "✨ Your words have power! Keep writing.",
+                "🚀 You're creating something amazing!",
+                "💡 Great ideas flow through your writing.",
+                "🎯 Every word brings you closer to mastery.",
+                "⚡ Your creativity is electric!",
+                "🏆 This content is going to be fantastic!"
+            ];
+            
+            let messageTimeout;
+            
+            document.getElementById('writing-editor').addEventListener('input', function() {
+                const text = this.value;
+                const words = text.trim().split(/\s+/).length;
+                
+                // Show inspirational messages at word milestones
+                if (words > 0 && words % 25 === 0) {
+                    clearTimeout(messageTimeout);
+                    messageTimeout = setTimeout(() => {
+                        showInspirationalMessage(inspirationalMessages[Math.floor(Math.random() * inspirationalMessages.length)]);
+                    }, 1000);
+                }
+            });
+            
+            // Easter egg: Type "writer's block" for special help
+            let writersBlockDetected = false;
+            document.getElementById('writing-editor').addEventListener('input', function() {
+                const text = this.value.toLowerCase();
+                if (text.includes("writer's block") || text.includes("writers block")) {
+                    if (!writersBlockDetected) {
+                        writersBlockDetected = true;
+                        showWritersBlockHelp();
+                    }
+                }
+            });
+        }
+
+        // Show inspirational message
+        function showInspirationalMessage(message) {
+            const messageElement = document.createElement('div');
+            messageElement.className = 'fixed top-20 left-1/2 transform -translate-x-1/2 bg-purple-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 font-medium text-center';
+            messageElement.innerHTML = `
+                <div class="flex items-center space-x-2">
+                    <span>🎉</span>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(messageElement);
+            
+            anime({
+                targets: messageElement,
+                translateY: [-20, 0],
+                opacity: [0, 1],
+                duration: 500,
+                easing: 'easeOutBack'
+            });
+            
+            setTimeout(() => {
+                anime({
+                    targets: messageElement,
+                    translateY: [0, -20],
+                    opacity: [1, 0],
+                    duration: 300,
+                    easing: 'easeInBack',
+                    complete: () => messageElement.remove()
+                });
+            }, 3000);
+        }
+
+        // Show writer's block help
+        function showWritersBlockHelp() {
+            const helpElement = document.createElement('div');
+            helpElement.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            helpElement.innerHTML = `
+                <div class="bg-white rounded-2xl p-8 max-w-md mx-4 text-center">
+                    <div class="text-4xl mb-4">🆘</div>
+                    <h3 class="font-display text-2xl font-bold text-gray-900 mb-2">Writer's Block?</h3>
+                    <p class="text-gray-600 mb-6">Here are some quick tips to get your creativity flowing:</p>
+                    <ul class="text-left space-y-2 mb-6 text-sm text-gray-700">
+                        <li>• Take a 5-minute break and come back</li>
+                        <li>• Write down your main point first</li>
+                        <li>• Use one of our writing prompts</li>
+                        <li>• Start with a personal story</li>
+                        <li>• Write badly on purpose to get started</li>
+                    </ul>
+                    <button class="bg-purple-500 text-white px-6 py-2 rounded-lg font-semibold hover:bg-purple-600 transition-colors duration-200" 
+                            onclick="this.parentElement.parentElement.remove()">
+                        Thanks, I'll try these!
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(helpElement);
+            
+            anime({
+                targets: helpElement.querySelector('div'),
+                scale: [0.8, 1],
+                opacity: [0, 1],
+                duration: 500,
+                easing: 'easeOutBack'
+            });
+        }
+    </script>
+</body>
+</html>

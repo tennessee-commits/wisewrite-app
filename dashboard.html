@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Dashboard - WriteWise</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --deep-slate: #2D3748;
+            --warm-coral: #FF6B6B;
+            --soft-sage: #68D391;
+            --neutral-gray: #718096;
+            --light-gray: #F7FAFC;
+            --charcoal: #1A202C;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        }
+        
+        .font-display { font-family: 'Playfair Display', serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        
+        .dashboard-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-blur {
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        .metric-highlight {
+            background: linear-gradient(135deg, var(--warm-coral) 0%, var(--soft-sage) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+        
+        .progress-ring-circle {
+            transition: stroke-dashoffset 0.35s;
+            transform-origin: 50% 50%;
+        }
+        
+        .writing-editor {
+            min-height: 300px;
+            resize: none;
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+        }
+        
+        .suggestion-card {
+            border-left: 4px solid var(--warm-coral);
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.05) 0%, rgba(255, 255, 255, 0.8) 100%);
+        }
+        
+        .improvement-indicator {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .streak-flame {
+            animation: flicker 1.5s ease-in-out infinite alternate;
+        }
+        
+        @keyframes flicker {
+            0% { transform: scale(1) rotate(-2deg); }
+            100% { transform: scale(1.1) rotate(2deg); }
+        }
+    </style>
+</head>
+<body class="text-gray-800 bg-gray-50">
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 nav-blur border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-gradient-to-r from-red-400 to-green-400 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">W</span>
+                    </div>
+                    <span class="font-display font-semibold text-xl text-gray-900">WriteWise</span>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="dashboard.html" class="text-red-400 font-medium">Dashboard</a>
+                    <a href="assistant.html" class="text-gray-600 hover:text-red-400 transition-colors duration-200">Assistant</a>
+                    <a href="challenges.html" class="text-gray-600 hover:text-red-400 transition-colors duration-200">Challenges</a>
+                    <a href="index.html#pricing" class="text-gray-600 hover:text-red-400 transition-colors duration-200">Upgrade</a>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-2">
+                        <div class="streak-flame text-orange-500">🔥</div>
+                        <span class="font-semibold text-gray-700" id="streak-counter">12</span>
+                        <span class="text-sm text-gray-500">day streak</span>
+                    </div>
+                    <div class="w-8 h-8 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full"></div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Dashboard Header -->
+    <section class="pt-24 pb-8 bg-gradient-to-r from-red-50 to-green-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center">
+                <div>
+                    <h1 class="font-display text-4xl font-bold text-gray-900 mb-2">
+                        Good morning, Alex! ☀️
+                    </h1>
+                    <p class="text-lg text-gray-600">
+                        Here's how your writing has improved this week
+                    </p>
+                </div>
+                
+                <div class="flex items-center space-x-6 mt-4 lg:mt-0">
+                    <div class="text-center">
+                        <div class="text-2xl font-bold metric-highlight">+15%</div>
+                        <div class="text-sm text-gray-500">This week</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold metric-highlight">89%</div>
+                        <div class="text-sm text-gray-500">Best score</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold metric-highlight">23</div>
+                        <div class="text-sm text-gray-500">Posts analyzed</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Dashboard -->
+    <section class="py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-3 gap-8">
+                <!-- Left Panel: Writing Quality Metrics -->
+                <div class="space-y-6">
+                    <div class="dashboard-card p-6 rounded-2xl">
+                        <h3 class="font-semibold text-lg text-gray-900 mb-6">Writing Quality Score</h3>
+                        
+                        <!-- Overall Score -->
+                        <div class="flex items-center justify-center mb-6">
+                            <div class="relative w-32 h-32">
+                                <svg class="w-32 h-32 progress-ring">
+                                    <circle cx="64" cy="64" r="56" stroke="#e5e7eb" stroke-width="8" fill="transparent"/>
+                                    <circle id="overall-progress" cx="64" cy="64" r="56" stroke="#FF6B6B" stroke-width="8" fill="transparent" 
+                                            stroke-dasharray="351.86" stroke-dashoffset="84.45" stroke-linecap="round" class="progress-ring-circle"/>
+                                </svg>
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <div class="text-center">
+                                        <div class="text-3xl font-bold text-gray-900">84%</div>
+                                        <div class="text-sm text-gray-500">Overall</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Detailed Metrics -->
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-medium text-gray-700">Clarity</span>
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-20 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                        <div class="h-full bg-green-400 rounded-full" style="width: 92%"></div>
+                                    </div>
+                                    <span class="text-sm font-semibold text-gray-900">92%</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-medium text-gray-700">Engagement</span>
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-20 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                        <div class="h-full bg-red-400 rounded-full" style="width: 78%"></div>
+                                    </div>
+                                    <span class="text-sm font-semibold text-gray-900">78%</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-medium text-gray-700">Readability</span>
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-20 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                        <div class="h-full bg-blue-400 rounded-full" style="width: 85%"></div>
+                                    </div>
+                                    <span class="text-sm font-semibold text-gray-900">85%</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-medium text-gray-700">Consistency</span>
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-20 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                        <div class="h-full bg-yellow-400 rounded-full" style="width: 81%"></div>
+                                    </div>
+                                    <span class="text-sm font-semibold text-gray-900">81%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Writing Trends Chart -->
+                    <div class="dashboard-card p-6 rounded-2xl">
+                        <h3 class="font-semibold text-lg text-gray-900 mb-4">7-Day Trend</h3>
+                        <div id="trends-chart" class="h-48"></div>
+                    </div>
+                    
+                    <!-- Achievement Progress -->
+                    <div class="dashboard-card p-6 rounded-2xl">
+                        <h3 class="font-semibold text-lg text-gray-900 mb-4">Recent Achievements</h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center space-x-3 p-3 bg-green-50 rounded-lg">
+                                <div class="text-2xl">🏆</div>
+                                <div>
+                                    <p class="font-semibold text-sm text-green-800">Clarity Master</p>
+                                    <p class="text-xs text-green-600">Achieved 90%+ clarity score</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg">
+                                <div class="text-2xl">🔥</div>
+                                <div>
+                                    <p class="font-semibold text-sm text-blue-800">Streak Warrior</p>
+                                    <p class="text-xs text-blue-600">12-day writing streak</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-3 p-3 bg-yellow-50 rounded-lg">
+                                <div class="text-2xl">⚡</div>
+                                <div>
+                                    <p class="font-semibold text-sm text-yellow-800">Speed Demon</p>
+                                    <p class="text-xs text-yellow-600">Wrote 5 posts in one day</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Center Panel: Recent Posts Analysis -->
+                <div class="space-y-6">
+                    <div class="dashboard-card p-6 rounded-2xl">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="font-semibold text-lg text-gray-900">Recent Posts</h3>
+                            <button class="text-sm text-red-400 hover:text-red-500 font-medium">View All</button>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <!-- Post 1 -->
+                            <div class="p-4 bg-white rounded-lg border border-gray-100 hover:border-red-200 transition-colors duration-200 cursor-pointer">
+                                <div class="flex items-start justify-between mb-2">
+                                    <p class="text-sm text-gray-800 flex-1">Just discovered a game-changing approach to content planning that doubled my engagement...</p>
+                                    <span class="text-xs text-gray-500 ml-2">2h ago</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-4 text-xs text-gray-500">
+                                        <span>📊 89% score</span>
+                                        <span>❤️ 247 likes</span>
+                                        <span>💬 23 replies</span>
+                                    </div>
+                                    <div class="flex items-center space-x-1">
+                                        <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+                                        <span class="text-xs text-green-600 font-medium">High</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Post 2 -->
+                            <div class="p-4 bg-white rounded-lg border border-gray-100 hover:border-red-200 transition-colors duration-200 cursor-pointer">
+                                <div class="flex items-start justify-between mb-2">
+                                    <p class="text-sm text-gray-800 flex-1">The biggest mistake new creators make is focusing on quantity over quality. Here's why...</p>
+                                    <span class="text-xs text-gray-500 ml-2">5h ago</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-4 text-xs text-gray-500">
+                                        <span>📊 76% score</span>
+                                        <span>❤️ 189 likes</span>
+                                        <span>💬 15 replies</span>
+                                    </div>
+                                    <div class="flex items-center space-x-1">
+                                        <div class="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                                        <span class="text-xs text-yellow-600 font-medium">Medium</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Post 3 -->
+                            <div class="p-4 bg-white rounded-lg border border-gray-100 hover:border-red-200 transition-colors duration-200 cursor-pointer">
+                                <div class="flex items-start justify-between mb-2">
+                                    <p class="text-sm text-gray-800 flex-1">3 lessons I learned after 100 days of consistent content creation 🧵</p>
+                                    <span class="text-xs text-gray-500 ml-2">1d ago</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-4 text-xs text-gray-500">
+                                        <span>📊 94% score</span>
+                                        <span>❤️ 412 likes</span>
+                                        <span>💬 38 replies</span>
+                                    </div>
+                                    <div class="flex items-center space-x-1">
+                                        <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+                                        <span class="text-xs text-green-600 font-medium">High</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Post 4 -->
+                            <div class="p-4 bg-white rounded-lg border border-gray-100 hover:border-red-200 transition-colors duration-200 cursor-pointer">
+                                <div class="flex items-start justify-between mb-2">
+                                    <p class="text-sm text-gray-800 flex-1">Building in public is overrated. Here's what actually works for growing your audience...</p>
+                                    <span class="text-xs text-gray-500 ml-2">2d ago</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-4 text-xs text-gray-500">
+                                        <span>📊 82% score</span>
+                                        <span>❤️ 301 likes</span>
+                                        <span>💬 27 replies</span>
+                                    </div>
+                                    <div class="flex items-center space-x-1">
+                                        <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+                                        <span class="text-xs text-green-600 font-medium">High</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Performance Comparison -->
+                    <div class="dashboard-card p-6 rounded-2xl">
+                        <h3 class="font-semibold text-lg text-gray-900 mb-4">Performance vs Last Week</h3>
+                        <div id="comparison-chart" class="h-48"></div>
+                    </div>
+                </div>
+                
+                <!-- Right Panel: Improvement Recommendations -->
+                <div class="space-y-6">
+                    <div class="dashboard-card p-6 rounded-2xl">
+                        <h3 class="font-semibold text-lg text-gray-900 mb-6">Focus Areas</h3>
+                        
+                        <div class="space-y-4">
+                            <div class="suggestion-card p-4 rounded-lg">
+                                <div class="flex items-start space-x-3">
+                                    <div class="text-red-400 text-lg">🎯</div>
+                                    <div class="flex-1">
+                                        <h4 class="font-semibold text-sm text-gray-900 mb-1">Hook Improvement</h4>
+                                        <p class="text-xs text-gray-600 mb-2">Your opening lines could be stronger. Try starting with a question or bold statement.</p>
+                                        <button class="text-xs text-red-500 hover:text-red-600 font-medium">Learn more →</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="p-4 bg-green-50 rounded-lg border-l-4 border-green-400">
+                                <div class="flex items-start space-x-3">
+                                    <div class="text-green-400 text-lg">✅</div>
+                                    <div class="flex-1">
+                                        <h4 class="font-semibold text-sm text-green-800 mb-1">Clarity Excellence</h4>
+                                        <p class="text-xs text-green-600">Your writing is clear and easy to understand. Keep it up!</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="p-4 bg-blue-50 rounded-lg border-l-4 border-blue-400">
+                                <div class="flex items-start space-x-3">
+                                    <div class="text-blue-400 text-lg">📈</div>
+                                    <div class="flex-1">
+                                        <h4 class="font-semibold text-sm text-blue-800 mb-1">Engagement Growing</h4>
+                                        <p class="text-xs text-blue-600">Your engagement metrics are trending upward. Consider adding more questions to boost interaction.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="p-4 bg-yellow-50 rounded-lg border-l-4 border-yellow-400">
+                                <div class="flex items-start space-x-3">
+                                    <div class="text-yellow-400 text-lg">⚡</div>
+                                    <div class="flex-1">
+                                        <h4 class="font-semibold text-sm text-yellow-800 mb-1">Consistency Boost</h4>
+                                        <p class="text-xs text-yellow-600">You're posting regularly! Try to maintain your 12-day streak.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Actions -->
+                    <div class="dashboard-card p-6 rounded-2xl">
+                        <h3 class="font-semibold text-lg text-gray-900 mb-6">Quick Actions</h3>
+                        
+                        <div class="space-y-3">
+                            <button class="w-full bg-red-400 hover:bg-red-500 text-white py-3 px-4 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center space-x-2">
+                                <span>✍️</span>
+                                <span>Start Writing Session</span>
+                            </button>
+                            
+                            <button class="w-full bg-green-400 hover:bg-green-500 text-white py-3 px-4 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center space-x-2">
+                                <span>🎯</span>
+                                <span>Daily Challenge</span>
+                            </button>
+                            
+                            <button class="w-full bg-blue-400 hover:bg-blue-500 text-white py-3 px-4 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center space-x-2">
+                                <span>📊</span>
+                                <span>Analyze Content</span>
+                            </button>
+                            
+                            <button class="w-full bg-purple-400 hover:bg-purple-500 text-white py-3 px-4 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center space-x-2">
+                                <span>📈</span>
+                                <span>View Reports</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Writing Stats -->
+                    <div class="dashboard-card p-6 rounded-2xl">
+                        <h3 class="font-semibold text-lg text-gray-900 mb-6">This Week</h3>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">Posts written</span>
+                                <span class="font-semibold text-gray-900">8</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">Avg. score</span>
+                                <span class="font-semibold text-gray-900">84%</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">Total engagement</span>
+                                <span class="font-semibold text-gray-900">1,247</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">Best performing</span>
+                                <span class="font-semibold text-green-600">94%</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">Improvement</span>
+                                <span class="font-semibold text-green-600 improvement-indicator">+12%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center space-x-2 mb-4 md:mb-0">
+                    <div class="w-8 h-8 bg-gradient-to-r from-red-400 to-green-400 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">W</span>
+                    </div>
+                    <span class="font-display font-semibold text-xl">WriteWise</span>
+                </div>
+                
+                <p class="text-gray-400 text-sm">
+                    © 2025 WriteWise. All rights reserved. Built for content creators who want to write better.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            initTrendsChart();
+            initComparisonChart();
+            animateProgressRings();
+            initQuickActions();
+            
+            console.log('Dashboard initialized with Piñata Protocol 🎉');
+        });
+
+        // Trends Chart
+        function initTrendsChart() {
+            const chartElement = document.getElementById('trends-chart');
+            if (!chartElement) return;
+
+            const chart = echarts.init(chartElement);
+            
+            const option = {
+                tooltip: {
+                    trigger: 'axis',
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    borderColor: '#e5e7eb',
+                    borderWidth: 1
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    axisLine: { lineStyle: { color: '#e5e7eb' } },
+                    axisLabel: { color: '#6b7280', fontSize: 12 }
+                },
+                yAxis: {
+                    type: 'value',
+                    min: 70,
+                    max: 100,
+                    axisLine: { lineStyle: { color: '#e5e7eb' } },
+                    axisLabel: { color: '#6b7280', fontSize: 12 },
+                    splitLine: { lineStyle: { color: '#f3f4f6' } }
+                },
+                series: [{
+                    name: 'Writing Score',
+                    type: 'line',
+                    smooth: true,
+                    data: [78, 82, 85, 79, 88, 91, 89],
+                    lineStyle: { color: '#FF6B6B', width: 3 },
+                    itemStyle: { color: '#FF6B6B' },
+                    areaStyle: {
+                        color: {
+                            type: 'linear',
+                            x: 0, y: 0, x2: 0, y2: 1,
+                            colorStops: [
+                                { offset: 0, color: 'rgba(255, 107, 107, 0.3)' },
+                                { offset: 1, color: 'rgba(255, 107, 107, 0.05)' }
+                            ]
+                        }
+                    }
+                }],
+                animationDuration: 2000
+            };
+
+            chart.setOption(option);
+            window.addEventListener('resize', () => chart.resize());
+        }
+
+        // Comparison Chart
+        function initComparisonChart() {
+            const chartElement = document.getElementById('comparison-chart');
+            if (!chartElement) return;
+
+            const chart = echarts.init(chartElement);
+            
+            const option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { type: 'shadow' }
+                },
+                legend: {
+                    data: ['This Week', 'Last Week'],
+                    bottom: 0,
+                    textStyle: { color: '#6b7280' }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '15%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: ['Clarity', 'Engagement', 'Readability', 'Consistency'],
+                    axisLine: { lineStyle: { color: '#e5e7eb' } },
+                    axisLabel: { color: '#6b7280', fontSize: 12 }
+                },
+                yAxis: {
+                    type: 'value',
+                    min: 60,
+                    max: 100,
+                    axisLine: { lineStyle: { color: '#e5e7eb' } },
+                    axisLabel: { color: '#6b7280', fontSize: 12 },
+                    splitLine: { lineStyle: { color: '#f3f4f6' } }
+                },
+                series: [
+                    {
+                        name: 'This Week',
+                        type: 'bar',
+                        data: [92, 78, 85, 81],
+                        itemStyle: { color: '#FF6B6B' },
+                        barWidth: '35%'
+                    },
+                    {
+                        name: 'Last Week',
+                        type: 'bar',
+                        data: [87, 71, 82, 76],
+                        itemStyle: { color: '#68D391' },
+                        barWidth: '35%'
+                    }
+                ],
+                animationDuration: 1500
+            };
+
+            chart.setOption(option);
+            window.addEventListener('resize', () => chart.resize());
+        }
+
+        // Animate progress rings
+        function animateProgressRings() {
+            const overallProgress = document.getElementById('overall-progress');
+            if (!overallProgress) return;
+
+            const circumference = 2 * Math.PI * 56;
+            const targetPercentage = 84;
+            const offset = circumference - (targetPercentage / 100) * circumference;
+
+            setTimeout(() => {
+                anime({
+                    targets: overallProgress,
+                    strokeDashoffset: offset,
+                    duration: 2000,
+                    easing: 'easeOutCubic'
+                });
+            }, 500);
+        }
+
+        // Quick Actions
+        function initQuickActions() {
+            const actionButtons = document.querySelectorAll('.dashboard-card button');
+            
+            actionButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const action = this.textContent.trim();
+                    
+                    // Add loading state
+                    const originalText = this.innerHTML;
+                    this.innerHTML = '<span class="animate-spin">⏳</span> Loading...';
+                    this.disabled = true;
+                    
+                    setTimeout(() => {
+                        this.innerHTML = originalText;
+                        this.disabled = false;
+                        
+                        // Navigate based on action
+                        if (action.includes('Writing Session')) {
+                            window.location.href = 'assistant.html';
+                        } else if (action.includes('Challenge')) {
+                            window.location.href = 'challenges.html';
+                        } else if (action.includes('Analyze')) {
+                            showComingSoon('Content Analysis');
+                        } else if (action.includes('Reports')) {
+                            showComingSoon('Advanced Reports');
+                        }
+                    }, 1000);
+                });
+            });
+        }
+
+        // Show coming soon modal
+        function showComingSoon(feature) {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-white rounded-2xl p-8 max-w-md mx-4 text-center">
+                    <div class="text-4xl mb-4">🚀</div>
+                    <h3 class="font-display text-2xl font-bold text-gray-900 mb-2">${feature}</h3>
+                    <p class="text-gray-600 mb-6">This feature is coming soon! We're working hard to bring you the best writing analytics experience.</p>
+                    <button class="bg-red-400 text-white px-6 py-2 rounded-lg font-semibold hover:bg-red-500 transition-colors duration-200" 
+                            onclick="this.parentElement.parentElement.remove()">
+                        Got it!
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Animate modal in
+            anime({
+                targets: modal.querySelector('div'),
+                scale: [0.8, 1],
+                opacity: [0, 1],
+                duration: 300,
+                easing: 'easeOutBack'
+            });
+        }
+
+        // Piñata Protocol surprises for dashboard
+        setTimeout(() => {
+            if (Math.random() < 0.3) {
+                showDashboardTip();
+            }
+        }, 3000);
+
+        function showDashboardTip() {
+            const tips = [
+                "💡 Pro tip: Click on any post to see detailed analysis",
+                "🏆 You've improved 15% this week! Keep it up!",
+                "📊 Hover over charts to see detailed metrics",
+                "🎯 Your clarity score is excellent - try focusing on engagement next",
+                "⚡ Quick action: Start a writing session to maintain your streak"
+            ];
+            
+            const tip = tips[Math.floor(Math.random() * tips.length)];
+            
+            const tipElement = document.createElement('div');
+            tipElement.className = 'fixed top-20 right-4 bg-white border border-gray-200 rounded-lg p-4 shadow-lg z-50 max-w-sm';
+            tipElement.innerHTML = `
+                <div class="flex items-start space-x-3">
+                    <div class="text-2xl">🎉</div>
+                    <div>
+                        <p class="font-semibold text-gray-900 mb-1">Dashboard Tip!</p>
+                        <p class="text-sm text-gray-600">${tip}</p>
+                    </div>
+                </div>
+                <button class="absolute top-2 right-2 text-gray-400 hover:text-gray-600" onclick="this.parentElement.remove()">
+                    <span class="text-lg">×</span>
+                </button>
+            `;
+            
+            document.body.appendChild(tipElement);
+            
+            setTimeout(() => {
+                if (tipElement.parentNode) {
+                    tipElement.remove();
+                }
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
