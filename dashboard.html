@@ -4,16 +4,142 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard – WiseWrite</title>
-  <link rel="stylesheet" href="resources/style.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background: #f7fafc; }
+    .metric-card {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+      backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+  </style>
 </head>
-<body>
-  <h1>Dashboard</h1>
-  <nav><a href="index.html">← Home</a></nav>
-  <section id="stats">
-    <div>Total Words: <span id="totalWords">0</span></div>
-    <div>Streak: <span id="streak">0</span> days</div>
+<body class="bg-gray-50 text-gray-800">
+  <!-- NAV -->
+  <nav class="bg-white shadow-sm border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <a href="index.html" class="text-gray-500 hover:text-gray-700 text-sm">← Home</a>
+        <h1 class="text-xl font-semibold text-gray-900">Dashboard</h1>
+        <div class="w-10"></div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- METRICS -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- Total Words -->
+      <div class="metric-card p-6 rounded-2xl shadow-lg">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-600">Total Words</p>
+            <p class="text-3xl font-bold text-gray-900" id="totalWords">0</p>
+          </div>
+          <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Streak -->
+      <div class="metric-card p-6 rounded-2xl shadow-lg">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-600">Writing Streak</p>
+            <p class="text-3xl font-bold text-gray-900" id="streak">0</p>
+          </div>
+          <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.657 7.343A8 8 0 0117.657 18.657z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.343 17.657a8 8 0 0111.314 0"></path></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Avg Score -->
+      <div class="metric-card p-6 rounded-2xl shadow-lg">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-600">Avg Quality Score</p>
+            <p class="text-3xl font-bold text-gray-900">78%</p>
+          </div>
+          <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+            <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+          </div>
+        </div>
+      </div>
+    </div>
   </section>
-  <canvas id="chart" width="400" height="200"></canvas>
+
+  <!-- CHART -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+    <div class="bg-white rounded-2xl shadow-lg p-6">
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">Writing Performance Over Time</h2>
+      <canvas id="chart" width="800" height="300" class="w-full"></canvas>
+    </div>
+  </section>
+
+  <!-- RECENT POSTS -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+    <div class="bg-white rounded-2xl shadow-lg p-6">
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">Recent Posts</h2>
+      <div class="space-y-4">
+        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+          <div>
+            <p class="font-medium text-gray-900">Thread on productivity hacks</p>
+            <p class="text-sm text-gray-600">2 hours ago</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <span class="text-sm text-gray-500">Score</span>
+            <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">85%</span>
+          </div>
+        </div>
+        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+          <div>
+            <p class="font-medium text-gray-900">Single post on morning routines</p>
+            <p class="text-sm text-gray-600">Yesterday</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <span class="text-sm text-gray-500">Score</span>
+            <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium">72%</span>
+          </div>
+        </div>
+        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+          <div>
+            <p class="font-medium text-gray-900">Reply to tech news</p>
+            <p class="text-sm text-gray-600">2 days ago</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <span class="text-sm text-gray-500">Score</span>
+            <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">91%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- IMPROVEMENT TIPS -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+    <div class="bg-white rounded-2xl shadow-lg p-6">
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">Improvement Tips</h2>
+      <div class="space-y-4">
+        <div class="p-4 bg-red-50 rounded-lg border-l-4 border-red-400">
+          <p class="font-medium text-red-800">Hook Improvement</p>
+          <p class="text-sm text-red-600 mt-1">Try stronger opening lines to grab attention faster.</p>
+        </div>
+        <div class="p-4 bg-green-50 rounded-lg border-l-4 border-green-400">
+          <p class="font-medium text-green-800">Clarity ✓</p>
+          <p class="text-sm text-green-600 mt-1">Excellent readability – keep it up!</p>
+        </div>
+        <div class="p-4 bg-yellow-50 rounded-lg border-l-4 border-yellow-400">
+          <p class="font-medium text-yellow-800">Engagement</p>
+          <p class="text-sm text-yellow-600 mt-1">Add more questions to boost replies.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <script src="main.js"></script>
 </body>
 </html>
